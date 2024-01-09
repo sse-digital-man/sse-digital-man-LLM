@@ -1,0 +1,1 @@
+COLLECTION_NAME = "digital_man_text2vec"
