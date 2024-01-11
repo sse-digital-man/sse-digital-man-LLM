@@ -1,7 +1,7 @@
 import sys
 sys.path.append(".")
 
-from voice_input_core.AudioRecorder import AudioRecorder
+from core.voice_input_core.AudioRecorder import AudioRecorder
 
 recorder = AudioRecorder()
 
@@ -17,4 +17,4 @@ input()
 recorder.stop()
 print("stop recording")
 
-recorder.save('./test/test_audio_recorder.wav')
+recorder.save('./test/voice_input/test_audio_recorder.wav')

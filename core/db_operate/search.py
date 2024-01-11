@@ -1,5 +1,5 @@
 import sys
-sys.path.append(".")
+sys.path.append("")
 
 import time
 import math
@@ -7,7 +7,7 @@ import csv
 from pymilvus import Collection
 from text2vec import SentenceModel
 from config import db_config
-from db_operate.connection_handler import open_connection, close_connection
+from core.db_operate.connection_handler import open_connection, close_connection
 
 def search(search_text):
     open_connection()

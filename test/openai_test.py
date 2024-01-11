@@ -5,7 +5,7 @@ import os
 import openai
 from config import api_config
 
-api_conf = api_config.api_config_info()
+api_conf = api_config.Api_config()
 openai.api_key = api_conf.openai_key
 
 # 指定使用的语言模型。此处选择GPT-3.5 Turbo模型。

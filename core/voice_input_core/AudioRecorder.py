@@ -4,7 +4,7 @@ import threading
 
 
 class AudioRecorder:
-    def __init__(self, chunk=1024, channels=1, rate=44100):
+    def __init__(self, chunk=1024, channels=1, rate=16000):
         self.CHUNK = chunk
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = channels

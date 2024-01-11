@@ -1,5 +1,5 @@
 import sys
-sys.path.append('.')
+sys.path.append('')
 
 import csv
 import openai
@@ -26,7 +26,7 @@ with open("data.csv", newline='') as file:
 class Bot:
     def __init__(self):
         # openai key
-        api_conf = api_config.api_config_info()
+        api_conf = api_config.Api_config()
         openai.api_key = api_conf.openai_key
 
         # prompt 内容

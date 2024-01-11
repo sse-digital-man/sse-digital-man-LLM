@@ -3,13 +3,16 @@ sys.path.append(".")
 
 from pymilvus import Collection, utility
 from config import db_config
-from db_operate.connection_handler import open_connection
-from db_operate.connection_handler import close_connection
-from db_operate.create_collection import create_collection
-from db_operate.create_embeddings import create_embeddings
-from db_operate.search import search
-from llm_core.Bot import Bot as Bot
-from voice_input_core.AudioRecorder import AudioRecorder
+import time
+from core.db_operate.connection_handler import open_connection
+from core.db_operate.connection_handler import close_connection
+from core.db_operate.create_collection import create_collection
+from core.db_operate.create_embeddings import create_embeddings
+from core.db_operate.search import search
+from core.llm_core.Bot import Bot as Bot
+from core.voice_input_core.AudioRecorder import AudioRecorder
+from core.voice_input_core.stt.oss_handler import upload
+from core.voice_input_core.stt.file_stt import fileTrans
 
 if __name__ == '__main__':
     open_connection()
@@ -48,8 +51,23 @@ if __name__ == '__main__':
                     recorder.start()
                 elif mic_op == 'stop':
                     recorder.stop()
+                    recorder.save('./core/voice_input_core/input.wav')
+                    break
                 else:
                     print("无效命令，请重新输入")
+
+            url = upload('./core/voice_input_core/input.wav', 'voice_input/input.wav')
+
+            stt_start_time = time.time()
+            question = fileTrans(url)
+            stt_end_time = time.time()
+            stt_elapsed_time = stt_end_time - stt_start_time
+            print()
+
+            search_result = search(question)
+            bot = Bot()
+            answer = bot.answer(question, search_result)
+            print(answer)
 
         elif user_input == 'exit':
             break

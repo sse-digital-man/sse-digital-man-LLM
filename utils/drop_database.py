@@ -5,8 +5,8 @@ sys.path.append(".")
 from config import db_config
 from pymilvus import utility
 
-from db_operate.connection_handler import open_connection
-from db_operate.connection_handler import close_connection
+from core.db_operate.connection_handler import open_connection
+from core.db_operate.connection_handler import close_connection
 
 
 def drop_database():
