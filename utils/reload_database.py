@@ -1,7 +1,7 @@
 import sys
 sys.path.append(".")
 
-import config
+from config import db_config
 from pymilvus import utility
 from db_operate.open_connection import open_connection
 from db_operate.create_collection import create_collection

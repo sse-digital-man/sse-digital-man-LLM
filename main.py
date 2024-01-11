@@ -1,12 +1,12 @@
 import sys
 sys.path.append(".")
 
-from pymilvus import Collection, CollectionSchema, FieldSchema, DataType, utility
+from pymilvus import Collection, utility
 from db_operate.open_connection import open_connection
 from db_operate.create_collection import create_collection
 from db_operate.create_embeddings import create_embeddings
 from db_operate.search import search
-from llm_core.answer import answer
+from llm_core.bot import Bot as Bot
 
 if __name__ == '__main__':
     collection_name = "digital_man_text2vec"
@@ -31,9 +31,11 @@ if __name__ == '__main__':
 
         if user_input.startswith('in '):
             # 提取'in '后面的字符串
-            data_input = user_input[3:]
-            search_result = search(data_input)
-            answer(search_result)
+            question = user_input[3:]
+            search_result = search(question)
+            bot = Bot()
+            answer = bot.answer(question, search_result)
+            print(answer)
         elif user_input == 'exit':
             break
         else:

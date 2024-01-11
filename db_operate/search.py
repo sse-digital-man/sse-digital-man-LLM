@@ -6,7 +6,8 @@ import math
 import csv
 from pymilvus import Collection
 from text2vec import SentenceModel
-import config
+from config import db_config
+
 
 def search(search_text):
     embedder = SentenceModel("shibing624/text2vec-base-chinese")
@@ -37,7 +38,7 @@ def search(search_text):
     print(f"对query进行embedding耗时：{elapsed_time}秒")
 
     # load collection to memory
-    collection = Collection(config.COLLECTION_NAME)
+    collection = Collection(db_config.COLLECTION_NAME)
     collection.load()
 
     # conduct similarity search
