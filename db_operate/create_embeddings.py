@@ -40,8 +40,6 @@ def create_embeddings(collection_name):
     # first_vec_len = math.sqrt(first_vec_len)
     # print(f"first_vec_len={first_vec_len}")
 
-    print("embedding created, sentence count: " + str(len(emb_list)))
-
     # build an index
     index_params = {
         "metric_type": "IP",
@@ -63,7 +61,9 @@ def create_embeddings(collection_name):
 
     collection.insert(data)
 
-    print("embeddings created in milvus database")
+    collection.flush()
+
+    print("embeddings created in milvus database, embedding count: " + str(len(emb_list)))
 
     # release collection, disconnect
     connections.disconnect("default")

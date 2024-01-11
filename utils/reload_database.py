@@ -1,25 +1,26 @@
 import sys
+
 sys.path.append(".")
 
 from config import db_config
-from pymilvus import utility
-from db_operate.open_connection import open_connection
+
+from db_operate.connection_handler import open_connection
+from db_operate.connection_handler import close_connection
 from db_operate.create_collection import create_collection
 from db_operate.create_embeddings import create_embeddings
-
+from utils.drop_database import drop_database
 
 
 # 重新执行create_collection和create_embeddings
 
+def reload_database():
+    # if collection with the same name already exists, drop the original collection
+    drop_database()
+    # create collection
+    create_collection(db_config.COLLECTION_NAME)
+    # create embeddings
+    create_embeddings(db_config.COLLECTION_NAME)
+
 open_connection()
-
-# if collection with the same name already exists, drop the original collection
-if utility.has_collection(config.COLLECTION_NAME):
-    utility.drop_collection(config.COLLECTION_NAME)
-    print("original collection deleted")
-
-# create collection
-create_collection(config.COLLECTION_NAME)
-
-# create embeddings
-create_embeddings(config.COLLECTION_NAME)
+reload_database()
+close_connection()

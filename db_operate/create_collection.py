@@ -28,6 +28,8 @@ def create_collection(collection_name):
         consistency_level="Strong"
     )
 
-    print("Collection created")
+    collection.flush()
+
+    print("collection created")
 
     return collection

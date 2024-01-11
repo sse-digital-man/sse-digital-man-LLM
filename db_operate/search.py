@@ -7,9 +7,11 @@ import csv
 from pymilvus import Collection
 from text2vec import SentenceModel
 from config import db_config
-
+from db_operate.connection_handler import open_connection, close_connection
 
 def search(search_text):
+    open_connection()
+
     embedder = SentenceModel("shibing624/text2vec-base-chinese")
     k = 5
 
@@ -65,5 +67,7 @@ def search(search_text):
     search_result = []
     for idx, similarity in zip(hits.ids, hits.distances):
         search_result.append((idx, similarity))
+
+    close_connection()
 
     return search_result

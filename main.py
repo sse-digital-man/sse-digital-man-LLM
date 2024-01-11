@@ -2,26 +2,27 @@ import sys
 sys.path.append(".")
 
 from pymilvus import Collection, utility
-from db_operate.open_connection import open_connection
+from config import db_config
+from db_operate.connection_handler import open_connection
+from db_operate.connection_handler import close_connection
 from db_operate.create_collection import create_collection
 from db_operate.create_embeddings import create_embeddings
 from db_operate.search import search
 from llm_core.bot import Bot as Bot
 
 if __name__ == '__main__':
-    collection_name = "digital_man_text2vec"
-
     open_connection()
 
     # initialize
 
-    if not utility.has_collection(collection_name): # 如果collection不存在,创建collection
-        create_collection(collection_name)
+    if not utility.has_collection(db_config.COLLECTION_NAME): # 如果collection不存在,创建collection
+        create_collection(db_config.COLLECTION_NAME)
 
-    collection = Collection(collection_name)
+    collection = Collection(db_config.COLLECTION_NAME)
 
     if collection.num_entities == 0: # 如果无embedding,创建embedding
-        create_embeddings(collection_name)
+        create_embeddings(db_config.COLLECTION_NAME)
+
 
     # search
 
@@ -40,3 +41,5 @@ if __name__ == '__main__':
             break
         else:
             print("无效命令，请重新输入")
+
+    close_connection()
