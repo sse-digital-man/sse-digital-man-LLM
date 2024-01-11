@@ -9,9 +9,9 @@ def open_connection():
         host="localhost",
         port='19530'
     )
-    print("connection opened")
+    # print("connection opened")
 
 
 def close_connection():
     connections.disconnect("default")
-    print("connection closed")
+    # print("connection closed")

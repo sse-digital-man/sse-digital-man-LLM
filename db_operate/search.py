@@ -22,8 +22,11 @@ def search(search_text):
         for row in reader:
             keyword_list.append(row[0])
 
-    start_time = time.time()
+
+
     # create target embedding
+    embed_start_time = time.time()
+
     emb_target = embedder.encode(search_text)
     # 转换为单位向量
     vec_len = 0
@@ -35,15 +38,16 @@ def search(search_text):
     for i in range(len(emb_target)):
         emb_target[i] = emb_target[i] / vec_len
 
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"对query进行embedding耗时：{elapsed_time}秒")
+    embed_end_time = time.time()
+    embed_elapsed_time = embed_end_time - embed_start_time
 
     # load collection to memory
     collection = Collection(db_config.COLLECTION_NAME)
     collection.load()
 
     # conduct similarity search
+
+    search_start_time = time.time()
 
     search_params = {
         "metric_type": "IP",
@@ -61,6 +65,12 @@ def search(search_text):
         output_fields=['output'],
         consistency_level="Strong"
     )
+
+    search_end_time = time.time()
+    search_elapsed_time = search_end_time - search_start_time
+
+    # print used time and search result
+    print(f"[info] 信息检索完毕。embed用时{format(embed_elapsed_time, '.2f')}s，检索用时{format(search_elapsed_time, '.2f')}s")
 
     # return result
     hits = results[0]

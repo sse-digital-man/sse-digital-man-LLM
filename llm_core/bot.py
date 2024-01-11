@@ -3,6 +3,7 @@ sys.path.append('.')
 
 import csv
 import openai
+import time
 from config import api_config
 
 SYS_PROMPT = '''你是一个电商主播，现在担任连州市丰阳镇的直播带货主播，请注意态度要风趣幽默，文明礼貌。请控制回答字数在40字以内。'''
@@ -43,9 +44,10 @@ class Bot:
         for id_similarity_pair in search_result:
             idx = id_similarity_pair[0]
             info_list.append(document_list[idx])
-            print("搜索结果:" + str(keyword_list[idx]) + ", 相似度:" + str(id_similarity_pair[1]))
+            print(f"搜索結果:{keyword_list[idx]}, 相似度:{format(id_similarity_pair[1], '.2f')}")
 
-        print("平均相似度:" + str(avg_similarity))
+        print(f"平均相似度:{format(avg_similarity,'.2f')}")
+        print()
 
         if avg_similarity >= self.threshold:
             cur_prompt = self.query_prompt.format(info_list, question)
@@ -55,6 +57,8 @@ class Bot:
 
         # print(cur_prompt) # debug: print current prompt
 
+        llm_start_time = time.time()
+
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -63,5 +67,12 @@ class Bot:
             ],
             temperature=0
         )
+
+        llm_end_time = time.time()
+
+        llm_elapsed_time = llm_end_time - llm_start_time
+
+        print(f"[info] 回答生成完毕。用时{llm_elapsed_time}s")
+        print()
 
         return response['choices'][0]['message']['content']
