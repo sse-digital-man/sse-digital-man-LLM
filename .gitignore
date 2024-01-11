@@ -3,3 +3,6 @@
 
 # key info
 system.conf
+
+# audios
+*.wav

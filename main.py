@@ -8,7 +8,8 @@ from db_operate.connection_handler import close_connection
 from db_operate.create_collection import create_collection
 from db_operate.create_embeddings import create_embeddings
 from db_operate.search import search
-from llm_core.bot import Bot as Bot
+from llm_core.Bot import Bot as Bot
+from voice_input_core.AudioRecorder import AudioRecorder
 
 if __name__ == '__main__':
     open_connection()
@@ -37,6 +38,19 @@ if __name__ == '__main__':
             bot = Bot()
             answer = bot.answer(question, search_result)
             print(answer)
+
+        elif user_input.strip() == 'mic':
+            recorder = AudioRecorder()
+            print("输入start开始，输入stop结束")
+            while True:
+                mic_op = input()
+                if mic_op == 'start':
+                    recorder.start()
+                elif mic_op == 'stop':
+                    recorder.stop()
+                else:
+                    print("无效命令，请重新输入")
+
         elif user_input == 'exit':
             break
         else:
