@@ -2,7 +2,7 @@ import sys
 sys.path.append('')
 
 import csv
-import openai
+from openai import OpenAI
 import time
 from config import api_config
 
@@ -27,7 +27,7 @@ class Bot:
     def __init__(self):
         # openai key
         api_conf = api_config.Api_config()
-        openai.api_key = api_conf.openai_key
+        self.client = OpenAI(api_key=api_conf.openai_key)
 
         # prompt 内容
         self.sys_prompt = SYS_PROMPT
@@ -59,7 +59,7 @@ class Bot:
 
         llm_start_time = time.time()
 
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": SYS_PROMPT},
@@ -75,4 +75,4 @@ class Bot:
         print(f"[info] 回答生成完毕。用时{llm_elapsed_time}s")
         print()
 
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content

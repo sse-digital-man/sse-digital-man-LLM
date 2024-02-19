@@ -1,0 +1,7 @@
+torch
+openai
+text2vec
+pymilvus
+PyAudio
+aliyun-python-sdk-core-v3
+oss2
