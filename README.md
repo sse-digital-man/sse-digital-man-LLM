@@ -1,3 +1,7 @@
+# 安装依赖
+已给出程序的依赖，使用以下指令安装：
+`pip install -r requirements.txt`
+
 # API key的设置
 在`system.example.conf`文件中填写API key，并将文件名改为`system.conf`
 
