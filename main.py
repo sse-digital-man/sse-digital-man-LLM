@@ -30,6 +30,8 @@ if __name__ == '__main__':
 
     # search
 
+    msg_history = []
+    question_history = ""
     print("请输入:")
     while True:
         user_input = input()
@@ -37,9 +39,13 @@ if __name__ == '__main__':
         if user_input.startswith('in '):
             # 提取'in '后面的字符串
             question = user_input[3:]
-            search_result = search(question)
+            question_history += (question + " ")
+            search_result = search(question_history)
             bot = Bot()
-            answer = bot.answer(question, search_result)
+            cur_prompt = bot.get_prompt(question, search_result)
+            answer = bot.answer(cur_prompt, msg_history)
+            msg_history.append({"role": "user", "content": cur_prompt})
+            msg_history.append({"role": "assistant", "content": answer})
             print(answer)
 
         elif user_input.strip() == 'mic':
@@ -60,13 +66,17 @@ if __name__ == '__main__':
 
             stt_start_time = time.time()
             question = fileTrans(url)
+            question_history += (question + " ")
             stt_end_time = time.time()
             stt_elapsed_time = stt_end_time - stt_start_time
             print()
 
-            search_result = search(question)
+            search_result = search(question_history)
             bot = Bot()
-            answer = bot.answer(question, search_result)
+            cur_prompt = bot.get_prompt(question, search_result)
+            answer = bot.answer(cur_prompt, msg_history)
+            msg_history.append({"role": "user", "content": cur_prompt})
+            msg_history.append({"role": "assistant", "content": answer})
             print(answer)
 
         elif user_input == 'exit':

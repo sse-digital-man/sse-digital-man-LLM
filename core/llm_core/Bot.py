@@ -37,7 +37,7 @@ class Bot:
         # 控制阈值
         self.threshold = 0.5
 
-    def answer(self, question, search_result):
+    def get_prompt(self, question, search_result):
         avg_similarity = sum(item[1] for item in search_result) / len(search_result)
 
         info_list = []
@@ -46,7 +46,7 @@ class Bot:
             info_list.append(document_list[idx])
             print(f"搜索結果:{keyword_list[idx]}, 相似度:{format(id_similarity_pair[1], '.2f')}")
 
-        print(f"平均相似度:{format(avg_similarity,'.2f')}")
+        print(f"平均相似度:{format(avg_similarity, '.2f')}")
         print()
 
         if avg_similarity >= self.threshold:
@@ -57,14 +57,20 @@ class Bot:
 
         # print(cur_prompt) # debug: print current prompt
 
+        return cur_prompt
+
+    def answer(self, prompt, msg_history):
         llm_start_time = time.time()
+
+        msgs = [{"role": "system", "content": SYS_PROMPT}]
+        msgs.extend(msg_history)
+        msgs.append({"role": "user", "content": prompt})
+
+        # print(msgs) # debug: print messages
 
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": SYS_PROMPT},
-                {"role": "user", "content": cur_prompt},
-            ],
+            messages=msgs,
             temperature=0
         )
 
@@ -72,7 +78,15 @@ class Bot:
 
         llm_elapsed_time = llm_end_time - llm_start_time
 
-        print(f"[info] 回答生成完毕。用时{llm_elapsed_time}s")
-        print()
+        print(f"[info] 回答生成完毕。用时{format(llm_elapsed_time, '.2f')}s")
+
+        # print token count and cost
+
+        cost = (0.5 * response.usage.prompt_tokens + 1.5 * response.usage.completion_tokens) / 1000000
+
+        print(f"[info] prompt_tokens: {response.usage.prompt_tokens}, "
+              f"completion_tokens: {response.usage.completion_tokens}, "
+              f"total_tokens: {response.usage.total_tokens}, "
+              f"cost: {cost}$")
 
         return response.choices[0].message.content
