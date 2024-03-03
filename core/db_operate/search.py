@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("")
 
 import time
@@ -8,6 +9,7 @@ from pymilvus import Collection
 from text2vec import SentenceModel
 from config import db_config
 from core.db_operate.connection_handler import open_connection, close_connection
+
 
 def search(search_text):
     open_connection()
@@ -21,8 +23,6 @@ def search(search_text):
         next(reader, None)  # 跳过首行
         for row in reader:
             keyword_list.append(row[0])
-
-
 
     # create target embedding
     embed_start_time = time.time()
@@ -70,7 +70,8 @@ def search(search_text):
     search_elapsed_time = search_end_time - search_start_time
 
     # print used time and search result
-    print(f"[info] 信息检索完毕。embed用时{format(embed_elapsed_time, '.2f')}s，检索用时{format(search_elapsed_time, '.2f')}s")
+    print(
+        f"[info] 信息检索完毕。embed用时{format(embed_elapsed_time, '.2f')}s，检索用时{format(search_elapsed_time, '.2f')}s")
 
     # return result
     hits = results[0]
