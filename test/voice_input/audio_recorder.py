@@ -1,5 +1,5 @@
 import sys
-sys.path.append(".")
+sys.path.append('.')
 
 from core.voice_input_core.AudioRecorder import AudioRecorder
 

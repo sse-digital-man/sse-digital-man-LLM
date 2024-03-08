@@ -1,5 +1,5 @@
 import sys
-sys.path.append(".")
+sys.path.append('.')
 
 from pymilvus import Collection, utility
 from config import db_config
@@ -39,14 +39,6 @@ if __name__ == '__main__':
         if user_input.startswith('in '):
             # 提取'in '后面的字符串
             question = user_input[3:]
-            question_history += (question + " ")
-            search_result = search(question_history)
-            bot = Bot()
-            cur_prompt = bot.get_prompt(question, search_result)
-            answer = bot.answer(cur_prompt, msg_history)
-            msg_history.append({"role": "user", "content": cur_prompt})
-            msg_history.append({"role": "assistant", "content": answer})
-            print(answer)
 
         elif user_input.strip() == 'mic':
             recorder = AudioRecorder()
@@ -66,22 +58,23 @@ if __name__ == '__main__':
 
             stt_start_time = time.time()
             question = fileTrans(url)
-            question_history += (question + " ")
             stt_end_time = time.time()
             stt_elapsed_time = stt_end_time - stt_start_time
             print()
-
-            search_result = search(question_history)
-            bot = Bot()
-            cur_prompt = bot.get_prompt(question, search_result)
-            answer = bot.answer(cur_prompt, msg_history)
-            msg_history.append({"role": "user", "content": cur_prompt})
-            msg_history.append({"role": "assistant", "content": answer})
-            print(answer)
 
         elif user_input == 'exit':
             break
         else:
             print("无效命令，请重新输入")
+            continue
+
+        question_history += (question + " ")
+        search_result = search(question_history)
+        bot = Bot()
+        cur_prompt = bot.get_prompt(question, search_result)
+        answer = bot.answer(cur_prompt, msg_history)
+        msg_history.append({"role": "user", "content": cur_prompt})
+        msg_history.append({"role": "assistant", "content": answer})
+        print(answer)
 
     close_connection()

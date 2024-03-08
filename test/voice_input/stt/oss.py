@@ -1,5 +1,5 @@
 import sys
-sys.path.append(".")
+sys.path.append('.')
 
 import oss2
 from config.api_config import Api_config
