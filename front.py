@@ -32,4 +32,3 @@ async def revmsg():
             recv_text = recv_msg[index + 11:len(recv_msg) - 2]
             clean_text = preprocess(recv_text)
             yield f"{clean_text}"
-
