@@ -14,6 +14,7 @@ from core.llm_core.Bot import Bot as Bot
 import asyncio
 from front import revmsg
 
+db_operator = DbOperator()
 
 async def producer(queue):
     count = 0
@@ -32,9 +33,9 @@ async def consumer(queue):
         user_input = await queue.get()
         print(f"Consuming: {user_input}")
 
-        search_result = search(user_input)
+        search_result = db_operator.search(user_input)
         bot = Bot()
-        cur_prompt = bot.get_prompt(question, search_result)
+        cur_prompt = bot.get_prompt(user_input, search_result)
         answer = bot.answer(cur_prompt, msg_history)
         print(answer)
 
@@ -63,6 +64,7 @@ if __name__ == '__main__':
     if collection.num_entities == 0:  # 如果无embedding,创建embedding
         create_embeddings(db_config.COLLECTION_NAME)
 
+    print('数字人内核已启动')
     asyncio.run(main())
     # producer_task  = asyncio.get_event_loop().run_until_complete(producer(queue))
 
