@@ -1,3 +1,4 @@
+import random
 import sys
 
 sys.path.append(".")
@@ -18,13 +19,40 @@ import asyncio
 from front import revmsg
 
 
-async def main():
+async def producer(queue):
+    count = 0
     async for user_input in revmsg():
-        print(user_input)
+        if queue.qsize() > 10:
+            print("Queue size is greater than 10. Waiting for 10 seconds.")
+            await asyncio.sleep(10)
+            continue
+        print(f"Producing: {user_input}")
+        await queue.put(user_input)
+        await asyncio.sleep(random.uniform(0.1, 0.5))
+
+
+async def consumer(queue):
+    while True:
+        user_input = await queue.get()
+        print(f"Consuming: {user_input}")
+
+
+
+        queue.task_done()
+
+
+async def main():
+    queue = asyncio.Queue()
+    producer_task = asyncio.create_task(producer(queue))
+    consumer_task = asyncio.create_task(consumer(queue))
+
+    await asyncio.gather(producer_task, consumer_task)
+    await queue.join()
 
 
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
+    # producer_task  = asyncio.get_event_loop().run_until_complete(producer(queue))
 
     # open_connection()
     #
