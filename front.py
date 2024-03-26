@@ -1,6 +1,7 @@
 import websockets
 import asyncio
 import re
+import json
 
 
 def preprocess(input_string):
@@ -28,7 +29,7 @@ async def revmsg():
     async with websockets.connect(ws_url) as websocket:
         while True:
             recv_msg = await websocket.recv()
-            index = recv_msg.find('content')
-            recv_text = recv_msg[index + 11:len(recv_msg) - 2]
-            clean_text = preprocess(recv_text)
-            yield f"{clean_text}"
+            recv_msg_json = json.loads(recv_msg)
+            if(recv_msg_json['type'] == 'ChatMessage'):
+                clean_text = preprocess(recv_msg_json['content'])
+                yield f"{clean_text}"
