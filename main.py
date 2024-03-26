@@ -14,7 +14,9 @@ from core.llm_core.Bot import Bot as Bot
 import asyncio
 from front import revmsg
 
+print('正在启动数字人内核')
 db_operator = DbOperator()
+msg_history = []
 
 async def producer(queue):
     count = 0
