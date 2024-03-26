@@ -5,7 +5,8 @@ from openai import OpenAI
 from config import api_config
 
 api_conf = api_config.Api_config()
-client = OpenAI(api_key=api_conf.openai_key)
+client = OpenAI(api_key=api_conf.openai_key,
+                base_url="https://api.chatanywhere.tech/v1")
 
 response = client.chat.completions.create(
     model="gpt-3.5-turbo",
