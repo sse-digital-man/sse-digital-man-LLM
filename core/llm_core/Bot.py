@@ -27,7 +27,8 @@ class Bot:
     def __init__(self):
         # openai key
         api_conf = api_config.Api_config()
-        self.client = OpenAI(api_key=api_conf.openai_key)
+        self.client = OpenAI(api_key=api_conf.openai_key,
+                             base_url="https://api.chatanywhere.tech/v1")
 
         # prompt 内容
         self.sys_prompt = SYS_PROMPT
