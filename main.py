@@ -10,12 +10,14 @@ from core.db_operate.DB_Operator import DbOperator
 from core.db_operate.connection_handler import open_connection
 from core.db_operate.connection_handler import close_connection
 from core.llm_core.Bot import Bot as Bot
+from core.tts_core.tts import TTS_Core
 
 import asyncio
 from front import revmsg
 
 print('正在启动数字人内核')
 db_operator = DbOperator()
+tts_core = TTS_Core()
 msg_history = []
 
 async def producer(queue):
@@ -35,11 +37,17 @@ async def consumer(queue):
         user_input = await queue.get()
         print(f"Consuming: {user_input}")
 
+        # LLM
         search_result = db_operator.search(user_input)
         bot = Bot()
         cur_prompt = bot.get_prompt(user_input, search_result)
         answer = bot.answer(cur_prompt, msg_history)
         print(answer)
+
+        # TTS
+        path = tts_core.tts_generate(answer)
+
+        # 存在队列里面
 
         queue.task_done()
 

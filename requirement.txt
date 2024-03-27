@@ -2,6 +2,7 @@ torch
 openai
 text2vec
 pymilvus
-PyAudio
+pasimple
+
 aliyun-python-sdk-core-v3
 oss2
