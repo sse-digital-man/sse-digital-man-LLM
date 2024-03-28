@@ -29,7 +29,7 @@ async def crawler(message_queue):
             print("Queue size is greater than 10. Waiting for 10 seconds.")
             await asyncio.sleep(10)
             continue
-        print(f"Producing: {user_input}")
+        print(f"[info] 用户输入: {user_input}")
         await message_queue.put(user_input)
         await asyncio.sleep(random.uniform(0.1, 0.5))
 
@@ -37,7 +37,7 @@ async def crawler(message_queue):
 async def llm(message_queue, audio_queue):
     while True:
         user_input = await message_queue.get()
-        print(f"Consuming: {user_input}")
+        # print(f"Consuming: {user_input}")
 
         # LLM
         search_result = db_operator.search(user_input)
@@ -47,7 +47,12 @@ async def llm(message_queue, audio_queue):
         print(answer)
 
         # TTS
+        tts_start_time = time.time()
+        print('[info] 开始生成音频')
         path = tts_core.tts_generate(answer)
+        tts_end_time = time.time()
+        tts_elapsed_time = tts_end_time - tts_start_time
+        print(f"[info] 音频生成完成。用时{format(tts_elapsed_time, '.2f')}s")
 
         # 存在队列里面
         await audio_queue.put(path)
@@ -57,9 +62,9 @@ async def llm(message_queue, audio_queue):
 async def play_audio(audio_queue):
     while True:
         path = await audio_queue.get()
-        print('playing')
+        print('[info] 开始播放音频')
         play_wav(path)
-        print('stop playing')
+        print('[info] 结束播放')
 
         audio_queue.task_done()
 
