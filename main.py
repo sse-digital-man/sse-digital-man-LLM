@@ -15,26 +15,28 @@ from core.tts_core.tts import TTS_Core
 import asyncio
 from front import revmsg
 
+from pasimple import play_wav
+
 print('正在启动数字人内核')
 db_operator = DbOperator()
 tts_core = TTS_Core()
 msg_history = []
 
-async def producer(queue):
+async def crawler(message_queue):
     count = 0
     async for user_input in revmsg():
-        if queue.qsize() > 10:
+        if message_queue.qsize() > 10:
             print("Queue size is greater than 10. Waiting for 10 seconds.")
             await asyncio.sleep(10)
             continue
         print(f"Producing: {user_input}")
-        await queue.put(user_input)
+        await message_queue.put(user_input)
         await asyncio.sleep(random.uniform(0.1, 0.5))
 
 
-async def consumer(queue):
+async def llm(message_queue, audio_queue):
     while True:
-        user_input = await queue.get()
+        user_input = await message_queue.get()
         print(f"Consuming: {user_input}")
 
         # LLM
@@ -48,18 +50,30 @@ async def consumer(queue):
         path = tts_core.tts_generate(answer)
 
         # 存在队列里面
+        await audio_queue.put(path)
 
-        queue.task_done()
+        message_queue.task_done()
+
+async def play_audio(audio_queue):
+    while True:
+        path = await audio_queue.get()
+        print('playing')
+        play_wav(path)
+        print('stop playing')
+
+        audio_queue.task_done()
 
 
 async def main():
-    queue = asyncio.Queue()
-    producer_task = asyncio.create_task(producer(queue))
-    consumer_task = asyncio.create_task(consumer(queue))
+    message_queue = asyncio.Queue()
+    audio_queue = asyncio.Queue()
+    crawler_task = asyncio.create_task(crawler(message_queue))
+    llm_task = asyncio.create_task(llm(message_queue, audio_queue))
+    play_audio_task = asyncio.create_task(play_audio(audio_queue))
 
-    await asyncio.gather(producer_task, consumer_task)
-    await queue.join()
-
+    await asyncio.gather(crawler_task, llm_task, play_audio_task)
+    await message_queue.join()
+    await audio_queue.join()
 
 if __name__ == '__main__':
     open_connection()

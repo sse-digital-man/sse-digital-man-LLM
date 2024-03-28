@@ -16,11 +16,3 @@ class TTS_Core:
         )
 
         return path
-    def tts_play(self, text):
-        path = self.client.predict(
-            text,  # str in '请填写您想生成的文本' Textbox component
-            "ms",  # Literal['ms', 'iflytek'] in '请选择模型' Dropdown component
-            api_name="/api"
-        )
-
-        play_wav(path)
