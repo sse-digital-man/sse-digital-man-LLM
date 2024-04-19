@@ -23,7 +23,6 @@ tts_core = TTS_Core()
 msg_history = []
 
 async def crawler(message_queue):
-    count = 0
     async for user_input in revmsg():
         if message_queue.qsize() > 10:
             print("Queue size is greater than 10. Waiting for 10 seconds.")
@@ -37,48 +36,55 @@ async def crawler(message_queue):
 async def llm(message_queue, audio_queue):
     while True:
         user_input = await message_queue.get()
-        # print(f"Consuming: {user_input}")
+        try:
+            # LLM
+            search_result = db_operator.search(user_input)
+            bot = Bot()
+            cur_prompt = bot.get_prompt(user_input, search_result)
+            answer = bot.answer(cur_prompt, msg_history)
+            print(answer)
 
-        # LLM
-        search_result = db_operator.search(user_input)
-        bot = Bot()
-        cur_prompt = bot.get_prompt(user_input, search_result)
-        answer = bot.answer(cur_prompt, msg_history)
-        print(answer)
+            # TTS
+            tts_start_time = time.time()
+            print('[info] 开始生成音频')
+            path = tts_core.tts_generate(answer)
+            tts_end_time = time.time()
+            tts_elapsed_time = tts_end_time - tts_start_time
+            print(f"[info] 音频生成完成。用时{format(tts_elapsed_time, '.2f')}s")
 
-        # TTS
-        tts_start_time = time.time()
-        print('[info] 开始生成音频')
-        path = tts_core.tts_generate(answer)
-        tts_end_time = time.time()
-        tts_elapsed_time = tts_end_time - tts_start_time
-        print(f"[info] 音频生成完成。用时{format(tts_elapsed_time, '.2f')}s")
+            # 存在队列里面
+            await audio_queue.put(path)
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-        # 存在队列里面
-        await audio_queue.put(path)
-
-        message_queue.task_done()
+        finally:
+            message_queue.task_done()
 
 async def play_audio(audio_queue):
     while True:
         path = await audio_queue.get()
-        print('[info] 开始播放音频')
-        play_wav(path)
-        print('[info] 结束播放')
+        try:
+            print('[info] 开始播放音频')
+            play_wav(path)
+            print('[info] 结束播放')
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-        audio_queue.task_done()
+        finally:
+            audio_queue.task_done()
 
 
 async def main():
     message_queue = asyncio.Queue()
     audio_queue = asyncio.Queue()
+
     crawler_task = asyncio.create_task(crawler(message_queue))
     llm_task = asyncio.create_task(llm(message_queue, audio_queue))
     play_audio_task = asyncio.create_task(play_audio(audio_queue))
 
     await asyncio.gather(crawler_task, llm_task, play_audio_task)
-    await message_queue.join()
-    await audio_queue.join()
+    # await message_queue.join()
+    # await audio_queue.join()
 
 if __name__ == '__main__':
     open_connection()

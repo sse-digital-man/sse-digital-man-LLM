@@ -10,6 +10,8 @@ class Api_config:
 
         self.openai_key = system_config.get('keys', 'openai_key')
 
+        self.tts_model = system_config.get('keys', 'tts_model')
+
         self.ali_nls_key_id = system_config.get('keys', 'ali_nls_key_id')
         self.ali_nls_key_secret = system_config.get('keys', 'ali_nls_key_secret')
         self.ali_nls_app_key = system_config.get('keys', 'ali_nls_app_key')
