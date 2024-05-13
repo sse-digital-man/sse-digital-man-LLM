@@ -12,9 +12,6 @@ from core.db_operate.connection_handler import open_connection, close_connection
 class DbOperator:
     def __init__(self):
         self.embedder = SentenceModel("shibing624/text2vec-base-chinese")
-        self.k = 5
-        self.DIM = 768
-        self.collection_name = "digital_man_text2vec"
 
     def create_collection(self, collection_name):
         id = FieldSchema(
@@ -25,7 +22,7 @@ class DbOperator:
         emb = FieldSchema(
             name="emb",
             dtype=DataType.FLOAT_VECTOR,
-            dim=self.DIM
+            dim=db_config.DIM
         )
 
         schema = CollectionSchema(
@@ -93,7 +90,7 @@ class DbOperator:
             data=[emb_target],
             anns_field="emb",
             param=search_params,
-            limit=self.k,
+            limit=db_config.k,
             expr=None,
             output_fields=['output'],
             consistency_level="Strong"

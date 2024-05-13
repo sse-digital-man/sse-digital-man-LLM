@@ -1,6 +1,5 @@
 from pymilvus import connections, Collection
-
-collection_name = "digital_man_text2vec"
+from config import db_config
 
 # connect to milvus server
 connections.connect(
@@ -12,7 +11,7 @@ connections.connect(
 )
 
 # get collection
-collection = Collection(collection_name)
+collection = Collection(db_config.COLLECTION_NAME)
 
 # load collection
 collection.load()
