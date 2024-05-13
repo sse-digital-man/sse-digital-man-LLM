@@ -6,3 +6,5 @@ pasimple
 
 aliyun-python-sdk-core-v3
 oss2
+
+gradio

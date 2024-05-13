@@ -4,7 +4,7 @@ sys.path.append("")
 import time
 import math
 import csv
-from pymilvus import Collection
+from pymilvus import FieldSchema, CollectionSchema, Collection, DataType, connections, utility
 from text2vec import SentenceModel
 from config import db_config
 from core.db_operate.connection_handler import open_connection, close_connection
@@ -13,6 +13,7 @@ class DbOperator:
     def __init__(self):
         self.embedder = SentenceModel("shibing624/text2vec-base-chinese")
         self.k = 5
+        self.DIM = 768
         self.collection_name = "digital_man_text2vec"
 
     def create_collection(self, collection_name):
@@ -24,7 +25,7 @@ class DbOperator:
         emb = FieldSchema(
             name="emb",
             dtype=DataType.FLOAT_VECTOR,
-            dim=DIM
+            dim=self.DIM
         )
 
         schema = CollectionSchema(
@@ -48,8 +49,6 @@ class DbOperator:
 
     def search(self, search_text):
         open_connection()
-
-        k = 5
 
         keyword_list = []
         with open("data.csv", newline='') as file:
@@ -94,7 +93,7 @@ class DbOperator:
             data=[emb_target],
             anns_field="emb",
             param=search_params,
-            limit=k,
+            limit=self.k,
             expr=None,
             output_fields=['output'],
             consistency_level="Strong"
@@ -130,7 +129,7 @@ class DbOperator:
                 keyword_list.append(row[0])
 
         # create embeddings
-        emb_list = embedder.encode(keyword_list)
+        emb_list = self.embedder.encode(keyword_list)
 
         # 转化为单位向量
         for vec in emb_list:

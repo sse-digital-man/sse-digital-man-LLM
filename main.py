@@ -7,8 +7,7 @@ from pymilvus import Collection, utility
 from config import db_config
 import time
 from core.db_operate.DB_Operator import DbOperator
-from core.db_operate.connection_handler import open_connection
-from core.db_operate.connection_handler import close_connection
+from core.db_operate.connection_handler import open_connection, close_connection
 from core.llm_core.Bot import Bot as Bot
 from core.tts_core.tts import TTS_Core
 
@@ -92,12 +91,12 @@ if __name__ == '__main__':
     # initialize
 
     if not utility.has_collection(db_config.COLLECTION_NAME):  # 如果collection不存在,创建collection
-        create_collection(db_config.COLLECTION_NAME)
+        db_operator.create_collection(db_config.COLLECTION_NAME)
 
     collection = Collection(db_config.COLLECTION_NAME)
 
     if collection.num_entities == 0:  # 如果无embedding,创建embedding
-        create_embeddings(db_config.COLLECTION_NAME)
+        db_operator.create_embeddings(db_config.COLLECTION_NAME)
 
     print('数字人内核已启动')
     asyncio.run(main())
