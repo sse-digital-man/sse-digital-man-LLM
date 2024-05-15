@@ -16,6 +16,8 @@ from front import revmsg
 
 import pygame
 
+from core import websocket_server
+
 print('正在启动数字人内核')
 db_operator = DbOperator()
 tts_core = TTS_Core()
@@ -65,13 +67,21 @@ async def play_audio(audio_queue):
     while True:
         path = await audio_queue.get()
         try:
-            print('[info] 开始播放音频')
-            sound = pygame.mixer.Sound(path)
-            channel = pygame.mixer.Channel(0)
-            channel.play(sound)
-            while channel.get_busy():
-                pygame.time.Clock().tick(30)
-            print('[info] 结束播放')
+            # print('[info] 开始播放音频')
+            # sound = pygame.mixer.Sound(path)
+            # channel = pygame.mixer.Channel(0)
+            # channel.play(sound)
+            # while channel.get_busy():
+            #     pygame.time.Clock().tick(30)
+            # print('[info] 结束播放')
+
+            # 推送ue
+            content = {'Topic': 'Unreal',
+                       'Data': {'Key': 'audio', 'Value': path, 'Text': '',
+                                'Time': 10, 'Type': 'interact'}}
+
+            websocket_server.get_instance().add_cmd(content)
+
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -92,7 +102,7 @@ async def main():
     # await audio_queue.join()
 
 if __name__ == '__main__':
-    # initialize
+    # initialize database
 
     client = get_db_client()
     collections = client.list_collections()
@@ -100,8 +110,16 @@ if __name__ == '__main__':
     if db_config.COLLECTION_NAME not in [c.name for c in collections]:
         reload_database(db_config.COLLECTION_NAME)
 
-
     print('数字人内核已启动')
+
+    # ue core
+    ws_server = websocket_server.new_instance(port=10002)
+    ws_server.start_server()
+    web_ws_server = websocket_server.new_web_instance(port=10003)
+    web_ws_server.start_server()
+
+    print('ue内核已启动')
+
     asyncio.run(main())
     # producer_task  = asyncio.get_event_loop().run_until_complete(producer(queue))
 
