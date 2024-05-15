@@ -3,23 +3,25 @@ import sys
 
 sys.path.append(".")
 
-from pymilvus import Collection, utility
 from config import db_config
 import time
 from core.db_operate.DB_Operator import DbOperator
-from core.db_operate.connection_handler import open_connection, close_connection
+from core.db_operate.connection_handler import get_db_client
 from core.llm_core.Bot import Bot as Bot
 from core.tts_core.tts import TTS_Core
+from utils.reload_database import reload_database
 
 import asyncio
 from front import revmsg
 
-from pasimple import play_wav
+import pygame
 
 print('正在启动数字人内核')
 db_operator = DbOperator()
 tts_core = TTS_Core()
 msg_history = []
+
+pygame.init()
 
 async def crawler(message_queue):
     async for user_input in revmsg():
@@ -37,7 +39,7 @@ async def llm(message_queue, audio_queue):
         user_input = await message_queue.get()
         try:
             # LLM
-            search_result = db_operator.search(user_input)
+            search_result = db_operator.search(db_config.COLLECTION_NAME, user_input)
             bot = Bot()
             cur_prompt = bot.get_prompt(user_input, search_result)
             answer = bot.answer(cur_prompt, msg_history)
@@ -64,7 +66,11 @@ async def play_audio(audio_queue):
         path = await audio_queue.get()
         try:
             print('[info] 开始播放音频')
-            play_wav(path)
+            sound = pygame.mixer.Sound(path)
+            channel = pygame.mixer.Channel(0)
+            channel.play(sound)
+            while channel.get_busy():
+                pygame.time.Clock().tick(30)
             print('[info] 结束播放')
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -86,20 +92,16 @@ async def main():
     # await audio_queue.join()
 
 if __name__ == '__main__':
-    open_connection()
-
     # initialize
 
-    if not utility.has_collection(db_config.COLLECTION_NAME):  # 如果collection不存在,创建collection
-        db_operator.create_collection(db_config.COLLECTION_NAME)
+    client = get_db_client()
+    collections = client.list_collections()
 
-    collection = Collection(db_config.COLLECTION_NAME)
+    if db_config.COLLECTION_NAME not in [c.name for c in collections]:
+        reload_database(db_config.COLLECTION_NAME)
 
-    if collection.num_entities == 0:  # 如果无embedding,创建embedding
-        db_operator.create_embeddings(db_config.COLLECTION_NAME)
 
     print('数字人内核已启动')
     asyncio.run(main())
     # producer_task  = asyncio.get_event_loop().run_until_complete(producer(queue))
 
-    # close_connection()

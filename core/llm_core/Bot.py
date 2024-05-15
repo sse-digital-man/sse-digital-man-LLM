@@ -15,7 +15,7 @@ SORRY_PROMPT = "{}\n以上是观众向你问的问题，如果该问题是日常
 
 keyword_list = []
 document_list = []
-with open("data.csv", newline='') as file:
+with open("data.csv", newline='', encoding='utf-8') as file:
     reader = csv.reader(file, delimiter=',')
     next(reader, None)  # 跳过首行
     for row in reader:
@@ -43,7 +43,7 @@ class Bot:
 
         info_list = []
         for id_similarity_pair in search_result:
-            idx = id_similarity_pair[0]
+            idx = int(id_similarity_pair[0])
             info_list.append(document_list[idx])
             print(f"搜索結果:{keyword_list[idx]}, 相似度:{format(id_similarity_pair[1], '.2f')}")
 

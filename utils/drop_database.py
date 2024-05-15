@@ -1,20 +1,16 @@
 import sys
 
 sys.path.append(".")
-
+from core.db_operate.connection_handler import get_db_client
 from config import db_config
-from pymilvus import utility
 
-from core.db_operate.connection_handler import open_connection
-from core.db_operate.connection_handler import close_connection
+def drop_database(collection_name):
+    client = get_db_client()
 
+    collections = client.list_collections()
 
-def drop_database():
-    # if collection with the same name already exists, drop the original collection
-    if utility.has_collection(db_config.COLLECTION_NAME):
-        utility.drop_collection(db_config.COLLECTION_NAME)
-        print("original collection dropped")
+    if collection_name in [c.name for c in collections]:
+        client.delete_collection(collection_name)
 
-open_connection()
-drop_database()
-close_connection()
+if __name__ == '__main__':
+    drop_database(db_config.COLLECTION_NAME)

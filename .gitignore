@@ -11,3 +11,7 @@ system.conf
 core/tts_core/localtts/config.yml
 core/tts_core/localtts/Data/tiejun/models/G_53000.pth
 core/tts_core/localtts/bert/chinese-roberta-wwm-ext-large/pytorch_model.bin
+
+# db
+db
+chroma.log

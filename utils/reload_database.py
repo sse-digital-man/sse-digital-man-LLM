@@ -4,23 +4,19 @@ sys.path.append(".")
 
 from config import db_config
 from core.db_operate.DB_Operator import DbOperator
-from core.db_operate.connection_handler import open_connection
-from core.db_operate.connection_handler import close_connection
-from core.db_operate.create_embeddings import create_embeddings
 from utils.drop_database import drop_database
 
 
 # 重新执行create_collection和create_embeddings
 
-def reload_database():
+def reload_database(collection_name):
     db_operator = DbOperator()
     # if collection with the same name already exists, drop the original collection
-    drop_database()
+    drop_database(collection_name)
     # create collection
-    db_operator.create_collection(db_config.COLLECTION_NAME)
+    db_operator.create_collection(collection_name)
     # create embeddings
-    db_operator.create_embeddings(db_config.COLLECTION_NAME)
+    db_operator.create_embeddings(collection_name)
 
-open_connection()
-reload_database()
-close_connection()
+if __name__ == '__main__':
+    reload_database(db_config.COLLECTION_NAME)
