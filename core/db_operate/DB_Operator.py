@@ -1,4 +1,7 @@
 import sys
+
+from chromadb import EmbeddingFunction, Documents, Embeddings
+
 sys.path.append('.')
 
 import time
@@ -8,9 +11,28 @@ from text2vec import SentenceModel
 from config import db_config
 from core.db_operate.connection_handler import get_db_client
 
+# class MyEmbeddingFunction(EmbeddingFunction):
+#     def __call__(self, texts: Documents) -> Embeddings:
+#         embedder = SentenceModel("shibing624/text2vec-base-chinese")
+#         embeddings = embedder.encode(texts)
+#
+#         # 转化为单位向量
+#         for vec in embeddings:
+#             vec_len = 0
+#             for x in vec:
+#                 vec_len = vec_len + x ** 2
+#
+#             vec_len = math.sqrt(vec_len)
+#
+#             for i in range(len(vec)):
+#                 vec[i] = vec[i] / vec_len
+#
+#         print(embeddings)
+#
+#         return embeddings
+
 class DbOperator:
     def __init__(self):
-        # self.embedder = SentenceModel("shibing624/text2vec-base-chinese")
         self.client = get_db_client()
 
     def create_collection(self, collection_name):

@@ -45,7 +45,7 @@ class Bot:
         for id_similarity_pair in search_result:
             idx = int(id_similarity_pair[0])
             info_list.append(document_list[idx])
-            print(f"搜索結果:{keyword_list[idx]}, 相似度:{format(id_similarity_pair[1], '.2f')}")
+            print(f"搜索结果:{keyword_list[idx]}, 相似度:{format(id_similarity_pair[1], '.2f')}")
 
         print(f"平均相似度:{format(avg_similarity, '.2f')}")
         print()
