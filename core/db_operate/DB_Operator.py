@@ -12,9 +12,9 @@ from config import db_config
 from core.db_operate.connection_handler import get_db_client
 
 # class MyEmbeddingFunction(EmbeddingFunction):
-#     def __call__(self, texts: Documents) -> Embeddings:
+#     def __call__(self, input: Documents) -> Embeddings:
 #         embedder = SentenceModel("shibing624/text2vec-base-chinese")
-#         embeddings = embedder.encode(texts)
+#         embeddings = embedder.encode(input)
 #
 #         # 转化为单位向量
 #         for vec in embeddings:
@@ -27,12 +27,11 @@ from core.db_operate.connection_handler import get_db_client
 #             for i in range(len(vec)):
 #                 vec[i] = vec[i] / vec_len
 #
-#         print(embeddings)
-#
 #         return embeddings
 
 class DbOperator:
     def __init__(self):
+        self.embedder = SentenceModel("shibing624/text2vec-base-chinese")
         self.client = get_db_client()
 
     def create_collection(self, collection_name):
@@ -48,9 +47,12 @@ class DbOperator:
         # get collection
         collection = self.client.get_collection(collection_name)
 
+        # get query embedding
+        query_embedding = self.embedder.encode(search_text)
+
         # conduct query
         results = collection.query(
-            query_texts=search_text,
+            query_embeddings=query_embedding.tolist(),
             n_results=db_config.k
         )
 
@@ -81,10 +83,26 @@ class DbOperator:
             for row in reader:
                 keyword_list.append(row[0])
 
-        # create embeddings in the collection
+        # calculate vectors
+        embeddings = self.embedder.encode(keyword_list)
+
+        # 转化为单位向量
+        for vec in embeddings:
+            vec_len = 0
+            for x in vec:
+                vec_len = vec_len + x ** 2
+
+            vec_len = math.sqrt(vec_len)
+
+            for i in range(len(vec)):
+                vec[i] = vec[i] / vec_len
+
+
+        # save embeddings in the collection
         collection.add(
             documents=keyword_list,
-            ids=[str(i) for i in range(0,len(keyword_list))]
+            ids=[str(i) for i in range(0,len(keyword_list))],
+            embeddings=embeddings.tolist()
         )
 
         print("embeddings created, embedding count: " + str(len(keyword_list)))
