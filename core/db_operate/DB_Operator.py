@@ -1,15 +1,15 @@
 import sys
 
-from chromadb import EmbeddingFunction, Documents, Embeddings
-
 sys.path.append('.')
 
 import time
 import math
 import csv
+
 from text2vec import SentenceModel
 from config import db_config
 from core.db_operate.connection_handler import get_db_client
+# from chromadb import EmbeddingFunction, Documents, Embeddings
 
 # class MyEmbeddingFunction(EmbeddingFunction):
 #     def __call__(self, input: Documents) -> Embeddings:
@@ -28,6 +28,7 @@ from core.db_operate.connection_handler import get_db_client
 #                 vec[i] = vec[i] / vec_len
 #
 #         return embeddings
+
 
 class DbOperator:
     def __init__(self):
@@ -101,7 +102,7 @@ class DbOperator:
         # save embeddings in the collection
         collection.add(
             documents=keyword_list,
-            ids=[str(i) for i in range(0,len(keyword_list))],
+            ids=[str(i) for i in range(0, len(keyword_list))],
             embeddings=embeddings.tolist()
         )
 

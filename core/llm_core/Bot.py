@@ -1,9 +1,10 @@
 import sys
+
 sys.path.append('')
 
+import time
 import csv
 from openai import OpenAI
-import time
 from config import api_config
 
 SYS_PROMPT = '''你是一个电商主播，现在担任连州市丰阳镇的直播带货主播，请注意态度要风趣幽默，文明礼貌。请控制回答字数在40字以内。'''

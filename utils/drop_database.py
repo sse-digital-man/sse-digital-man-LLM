@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append(".")
+
 from core.db_operate.connection_handler import get_db_client
 from config import db_config
 

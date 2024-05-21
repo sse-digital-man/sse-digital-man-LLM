@@ -1,8 +1,10 @@
 import sys
+
 sys.path.append('.')
 
 import chromadb
 from config import db_config
+
 
 def get_db_client():
     client = chromadb.HttpClient(host='localhost', port=db_config.client_port)

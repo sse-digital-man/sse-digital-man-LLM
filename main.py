@@ -1,25 +1,22 @@
-import os.path
-import random
 import sys
 
 sys.path.append(".")
 
-from config import db_config
+import asyncio
 import time
+import random
+import pygame
+
+from config import db_config
+from core import websocket_server
 from core.db_operate.DB_Operator import DbOperator
 from core.db_operate.connection_handler import get_db_client
 from core.llm_core.Bot import Bot as Bot
 from core.tts_core.tts import TTS_Core
+from core.ue_core.ovr_lipsync.test_olipsync import LipSyncGenerator
 from utils.reload_database import reload_database
-
-import asyncio
 from front import revmsg
 
-import pygame
-
-from core import websocket_server
-
-from core.ue_core.ovr_lipsync.test_olipsync import LipSyncGenerator
 
 print('正在启动数字人内核')
 db_operator = DbOperator()

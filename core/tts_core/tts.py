@@ -2,7 +2,6 @@ import sys
 sys.path.append(".")
 
 from gradio_client import Client
-
 from config import api_config
 
 class TTS_Core:
