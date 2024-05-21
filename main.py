@@ -1,3 +1,4 @@
+import os.path
 import random
 import sys
 
@@ -17,6 +18,8 @@ from front import revmsg
 import pygame
 
 from core import websocket_server
+
+from core.ue_core.ovr_lipsync.test_olipsync import LipSyncGenerator
 
 print('正在启动数字人内核')
 db_operator = DbOperator()
@@ -39,6 +42,7 @@ async def crawler(message_queue):
 async def llm(message_queue, audio_queue):
     while True:
         user_input = await message_queue.get()
+
         try:
             # LLM
             search_result = db_operator.search(db_config.COLLECTION_NAME, user_input)
@@ -56,7 +60,7 @@ async def llm(message_queue, audio_queue):
             print(f"[info] 音频生成完成。用时{format(tts_elapsed_time, '.2f')}s")
 
             # 存在队列里面
-            await audio_queue.put(path)
+            await audio_queue.put((path, user_input, answer))
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -65,22 +69,46 @@ async def llm(message_queue, audio_queue):
 
 async def play_audio(audio_queue):
     while True:
-        path = await audio_queue.get()
+        path, question, answer = await audio_queue.get()
         try:
-            # print('[info] 开始播放音频')
-            # sound = pygame.mixer.Sound(path)
-            # channel = pygame.mixer.Channel(0)
-            # channel.play(sound)
-            # while channel.get_busy():
-            #     pygame.time.Clock().tick(30)
-            # print('[info] 结束播放')
+            # 获取音频长度
+            sound = pygame.mixer.Sound(path)
+            audio_length = sound.get_length()
 
-            # 推送ue
+            # 发送问题文本给UE
             content = {'Topic': 'Unreal',
-                       'Data': {'Key': 'audio', 'Value': path, 'Text': '',
-                                'Time': 10, 'Type': 'interact'}}
+                       'Data': {'Key': 'question', 'Value': question}}
 
             websocket_server.get_instance().add_cmd(content)
+
+            # 发送回答文本给UE
+            content = {'Topic': 'Unreal',
+                       'Data': {'Key': 'text', 'Value': answer}}
+
+            websocket_server.get_instance().add_cmd(content)
+
+            # 发送音频给UE
+            content = {'Topic': 'Unreal',
+                       'Data': {'Key': 'audio', 'Value': path, 'Text': answer,
+                                'Time': audio_length, 'Type': 'interact', 'Lips':[]}}
+
+            # 计算唇形
+            print('[info] 开始计算唇形')
+            lips_start_time = time.time()
+            lip_sync_generator = LipSyncGenerator()
+            viseme_list = lip_sync_generator.generate_visemes(path)
+            consolidated_visemes = lip_sync_generator.consolidate_visemes(viseme_list)
+            content["Data"]["Lips"] = consolidated_visemes
+            lips_end_time = time.time()
+            lips_elapsed_time = lips_end_time - lips_start_time
+            print(f"[info] 唇形计算完成。用时{format(lips_elapsed_time, '.2f')}s")
+
+            websocket_server.get_instance().add_cmd(content)
+
+            # 等待音频播放结束
+            await asyncio.sleep(audio_length)
+
+            print('[info] 音频播放完毕')
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -117,6 +145,11 @@ if __name__ == '__main__':
     ws_server.start_server()
     web_ws_server = websocket_server.new_web_instance(port=10003)
     web_ws_server.start_server()
+
+    web_server_instance = websocket_server.get_web_instance()
+    web_server_instance.add_cmd({"liveState": 1})
+    web_server_instance.add_cmd({"is_connect": True})
+
 
     print('ue内核已启动')
 
