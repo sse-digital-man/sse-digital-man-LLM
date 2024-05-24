@@ -2,7 +2,6 @@ torch
 openai
 text2vec
 chromadb
-
 pygame
-
 gradio
+pyyaml
