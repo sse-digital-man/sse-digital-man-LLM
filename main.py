@@ -12,14 +12,13 @@ from core import websocket_server
 from core.db_operate.DB_Operator import db_operator
 from core.db_operate.connection_handler import get_db_client
 from core.llm_core.Bot import Bot as Bot
-from core.tts_core.tts import TTS_Core
+from core.tts_core.tts import tts_core
 from core.ue_core.ovr_lipsync.test_olipsync import LipSyncGenerator
 from utils.reload_database import reload_database
 from front import revmsg
 
 
 print('正在启动数字人内核')
-tts_core = TTS_Core()
 msg_history = [] #暂未启用
 
 async def crawler(message_queue):

@@ -37,3 +37,5 @@ class TTS_Core:
             return path
         else:
             throw('tts model not supported')
+
+tts_core = TTS_Core()
