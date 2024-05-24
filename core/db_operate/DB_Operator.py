@@ -107,3 +107,5 @@ class DbOperator:
         )
 
         print("embeddings created, embedding count: " + str(len(keyword_list)))
+
+db_operator = DbOperator()
