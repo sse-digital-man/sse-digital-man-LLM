@@ -2,15 +2,12 @@ import sys
 sys.path.append(".")
 
 import oss2
-from config.api_config import Api_config
+from config.ConfigLoader import config
+
 
 def upload(file_path, oss_path):
-
-
-    api_config = Api_config()
-
-    auth = oss2.Auth(api_config.ali_nls_key_id, api_config.ali_nls_key_secret)
-    bucket = oss2.Bucket(auth, api_config.oss_endpoint, api_config.oss_bucket_name)
+    auth = oss2.Auth(config.ali_nls_key_id, config.ali_nls_key_secret)
+    bucket = oss2.Bucket(auth, config.oss_endpoint, config.oss_bucket_name)
 
     # upload file
 

@@ -7,13 +7,11 @@ from aliyunsdkcore.acs_exception.exceptions import ClientException
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
-from config.api_config import Api_config
+from config.ConfigLoader import config
 
-api_config = Api_config()
-
-accessKeyId = api_config.ali_nls_key_id
-accessKeySecret = api_config.ali_nls_key_secret
-appKey = api_config.ali_nls_app_key
+accessKeyId = config.ali_nls_key_id
+accessKeySecret = config.ali_nls_key_secret
+appKey = config.ali_nls_app_key
 
 def fileTrans(fileLink) :
     start_time = time.time()

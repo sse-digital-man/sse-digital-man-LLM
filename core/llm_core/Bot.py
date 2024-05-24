@@ -5,7 +5,7 @@ sys.path.append('')
 import time
 import csv
 from openai import OpenAI
-from config import api_config
+from config.ConfigLoader import config
 
 SYS_PROMPT = '''你是一个电商主播，现在担任连州市丰阳镇的直播带货主播，请注意态度要风趣幽默，文明礼貌。请控制回答字数在40字以内。'''
 QUERY_PROMPT = "你现在知道这些知识：{}\n有观众问你这个问题：{}\n作为连州市丰阳镇的直播带货主播，请用口语化文本清晰地回答观众提出的问题，并一定要控制回答在40字以内！你的回答："
@@ -27,8 +27,7 @@ with open("data.csv", newline='', encoding='utf-8') as file:
 class Bot:
     def __init__(self):
         # openai key
-        api_conf = api_config.Api_config()
-        self.client = OpenAI(api_key=api_conf.openai_key,
+        self.client = OpenAI(api_key=config.openai_key,
                              base_url="https://api.chatanywhere.tech/v1")
 
         # prompt 内容

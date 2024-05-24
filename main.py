@@ -7,7 +7,7 @@ import time
 import random
 import pygame
 
-from config import db_config
+from config.ConfigLoader import config
 from core import websocket_server
 from core.db_operate.DB_Operator import DbOperator
 from core.db_operate.connection_handler import get_db_client
@@ -21,9 +21,7 @@ from front import revmsg
 print('正在启动数字人内核')
 db_operator = DbOperator()
 tts_core = TTS_Core()
-msg_history = []
-
-pygame.init()
+msg_history = [] #暂未启用
 
 async def crawler(message_queue):
     async for user_input in revmsg():
@@ -42,7 +40,7 @@ async def llm(message_queue, audio_queue):
 
         try:
             # LLM
-            search_result = db_operator.search(db_config.COLLECTION_NAME, user_input)
+            search_result = db_operator.search(config.db_collection_name, user_input)
             bot = Bot()
             cur_prompt = bot.get_prompt(user_input, search_result)
             answer = bot.answer(cur_prompt, msg_history)
@@ -127,13 +125,16 @@ async def main():
     # await audio_queue.join()
 
 if __name__ == '__main__':
+    # initialize pygame
+    pygame.init()
+
     # initialize database
 
     client = get_db_client()
     collections = client.list_collections()
 
-    if db_config.COLLECTION_NAME not in [c.name for c in collections]:
-        reload_database(db_config.COLLECTION_NAME)
+    if config.db_collection_name not in [c.name for c in collections]:
+        reload_database(config.db_collection_name)
 
     print('数字人内核已启动')
 

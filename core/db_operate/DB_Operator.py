@@ -7,7 +7,7 @@ import math
 import csv
 
 from text2vec import SentenceModel
-from config import db_config
+from config.ConfigLoader import config
 from core.db_operate.connection_handler import get_db_client
 # from chromadb import EmbeddingFunction, Documents, Embeddings
 
@@ -54,7 +54,7 @@ class DbOperator:
         # conduct query
         results = collection.query(
             query_embeddings=query_embedding.tolist(),
-            n_results=db_config.k
+            n_results=config.db_k
         )
 
         search_end_time = time.time()

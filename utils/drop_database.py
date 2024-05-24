@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 from core.db_operate.connection_handler import get_db_client
-from config import db_config
+from config.ConfigLoader import config
 
 def drop_database(collection_name):
     client = get_db_client()
@@ -15,4 +15,4 @@ def drop_database(collection_name):
         print('collection dropped')
 
 if __name__ == '__main__':
-    drop_database(db_config.COLLECTION_NAME)
+    drop_database(config.db_collection_name)

@@ -2,15 +2,14 @@ import sys
 sys.path.append(".")
 
 from gradio_client import Client
-from config import api_config
+from config.ConfigLoader import config
 
 class TTS_Core:
     def __init__(self):
-        self.api_conf = api_config.Api_config()
         self.client = Client("http://127.0.0.1:6006/")
 
     def tts_generate(self, text):
-        model = self.api_conf.tts_model
+        model = config.tts_model
 
         if model == "ms":
             path = self.client.predict(

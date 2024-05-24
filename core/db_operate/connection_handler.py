@@ -3,11 +3,11 @@ import sys
 sys.path.append('.')
 
 import chromadb
-from config import db_config
+from config.ConfigLoader import config
 
 
 def get_db_client():
-    client = chromadb.HttpClient(host='localhost', port=db_config.client_port)
+    client = chromadb.HttpClient(host='localhost', port=config.db_client_port)
     return client
 
 # def open_connection():

@@ -1,0 +1,13 @@
+api_keys:
+  llm:
+    openai_key:
+
+api_config:
+  tts:
+    tts_model: # ms / tiejun
+
+chroma_db_config:
+  client_port: 8000
+  collection_name: digital_man
+  dimension: 768
+  k: 5
