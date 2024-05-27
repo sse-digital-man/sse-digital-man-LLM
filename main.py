@@ -15,7 +15,7 @@ from core.llm_core.Bot import Bot as Bot
 from core.tts_core.tts import tts_core
 from core.ue_core.ovr_lipsync.test_olipsync import LipSyncGenerator
 from utils.reload_database import reload_database
-from front import revmsg
+from front import revmsg, preprocess
 
 
 print('正在启动数字人内核')
@@ -44,16 +44,19 @@ async def llm(message_queue, audio_queue):
             answer = bot.answer(cur_prompt, msg_history)
             print(answer)
 
+            # 对回答进行预处理
+            cleaned_answer = preprocess(answer)
+
             # TTS
             tts_start_time = time.time()
             print('[info] 开始生成音频')
-            path = tts_core.tts_generate(answer)
+            path = tts_core.tts_generate(cleaned_answer)
             tts_end_time = time.time()
             tts_elapsed_time = tts_end_time - tts_start_time
             print(f"[info] 音频生成完成。用时{format(tts_elapsed_time, '.2f')}s")
 
             # 存在队列里面
-            await audio_queue.put((path, user_input, answer))
+            await audio_queue.put((path, user_input, cleaned_answer))
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -102,6 +105,10 @@ async def play_audio(audio_queue):
             await asyncio.sleep(audio_length)
 
             print('[info] 音频播放完毕')
+
+            # 回答的时间间隔
+            await asyncio.sleep(config.answer_interval)
+            print('[info] 回答时间间隔结束')
 
         except Exception as e:
             print(f"An error occurred: {e}")
