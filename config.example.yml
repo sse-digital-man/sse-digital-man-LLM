@@ -6,6 +6,9 @@ api_config:
   tts:
     tts_model: # ms / tiejun
 
+ue_config:
+  answer_interval: #播放回答的时间间隔，单位为s
+
 chroma_db_config:
   client_port: 8000
   collection_name: digital_man
