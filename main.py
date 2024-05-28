@@ -2,6 +2,9 @@ import sys
 
 sys.path.append(".")
 
+from config.CLIArgsParser import args_parser
+args_parser.get_args()
+
 import asyncio
 import time
 import random
@@ -130,6 +133,8 @@ async def main():
     # await audio_queue.join()
 
 if __name__ == '__main__':
+    # get command line argument
+
     # initialize pygame
     pygame.init()
 

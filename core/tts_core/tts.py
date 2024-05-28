@@ -3,22 +3,28 @@ sys.path.append(".")
 
 from gradio_client import Client
 from config.ConfigLoader import config
+from config.CLIArgsParser import args_parser
 
 class TTS_Core:
     def __init__(self):
         self.client = Client("http://127.0.0.1:6006/")
+        if args_parser.tts_model == None:
+            self.model = config.tts_model
+        else:
+            self.model = args_parser.tts_model
+
+        print(f"TTS Model: {self.model}")
+
 
     def tts_generate(self, text):
-        model = config.tts_model
-
-        if model == "ms":
+        if self.model == "ms":
             path = self.client.predict(
                 text,  # str in '请填写您想生成的文本' Textbox component
                 "ms",  # Literal['ms', 'iflytek'] in '请选择模型' Dropdown component
                 api_name="/api"
             )
             return path
-        elif model == "tiejun":
+        elif self.model == "tiejun":
             result = self.client.predict(
                     text,	# str in '输入文本内容' Textbox component
                     "tiejun",	# Literal['tiejun'] in '选择说话人' Dropdown component
@@ -39,3 +45,4 @@ class TTS_Core:
             throw('tts model not supported')
 
 tts_core = TTS_Core()
+
